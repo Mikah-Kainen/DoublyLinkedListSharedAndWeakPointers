@@ -22,15 +22,21 @@ public:
 	std::shared_ptr<Node<T>> Search(T targetValue)
 	{
 		std::shared_ptr<Node<T>> current = Head;
-		for (size_t i = 0; i < count; i ++)
+		while(true)
 		{
 			if (current->Value == targetValue)
 			{
 				return current;
 			}
-			current = current->Next;
+			if (current->Next)
+			{
+				current = current->Next;
+			}
+			else
+			{
+				return nullptr;
+			}
 		}
-		return nullptr;
 	}
 
 	void AddFirst(T value)
@@ -66,42 +72,73 @@ public:
 		}
 	}
 
-	void AddBefore(std::shared_ptr<Node<T>> targetNode, T targetValue)
+	void AddAfter(T nodeValue, T addValue)
 	{
+		std::shared_ptr<Node<T>> targetNode = Search(nodeValue);
+		if (!targetNode)
+		{
+			return;
+		}
 		if (!Head)
 		{
-			AddFirst(targetValue);
+			AddFirst(addValue);
 		}
 		else if (targetNode == Tail)
 		{
-			AddLast(targetValue);
+			AddLast(addValue);
 		}
 		else
 		{
 			std::shared_ptr<Node<T>> temp = std::move(targetNode->Next);
-			targetNode->Next = std::make_shared<Node<T>>(targetValue);
+			targetNode->Next = std::make_shared<Node<T>>(addValue);
 			targetNode->Next->Previous = targetNode;
 			targetNode->Next->Next = temp;
-			temp->Previous = targetNode.Next;
+			temp->Previous = targetNode->Next;
 			count++;
 		}
 	}
 
-	void AddAfter(std::shared_ptr<Node<T>> targetNode, T targetValue)
+	void AddBefore(T nodeValue, T addValue)
 	{
+		std::shared_ptr<Node<T>> targetNode = Search(nodeValue);
+		if (!targetNode)
+		{
+			return;
+		}
 		if (!Head || targetNode == Head)
 		{
-			AddFirst(targetNode);
+			AddFirst(addValue);
 		}
 		else
 		{
-			AddBefore(targetNode.Previous.lock(), targetValue);
+			AddAfter(targetNode->Previous.lock()->Value, addValue);
 		}
 	}
 
-	bool Remove()
+	bool Remove(T removeValue)
 	{
-		
+		std::shared_ptr<Node<T>> targetNode = Search(removeValue);
+		if (!targetNode)
+		{
+			return false;
+		}
+		if (targetNode == Head) 
+		{
+
+		}
+		else if (targetNode == Tail)
+		{
+
+		}
+		else
+		{
+			targetNode->Previous.lock()->Next = targetNode->Next;
+			targetNode->Next->Previous = targetNode->Previous.lock();
+		}
+
+
+		count--;
+		return true;
 	}
 };
 
