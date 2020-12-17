@@ -19,6 +19,14 @@ public:
 	{
 	}
 
+	~LinkedList()
+	{
+		while (Head)
+		{
+			Head = std::move(Head->Next);
+		}
+	}
+
 	std::shared_ptr<Node<T>> Search(T targetValue)
 	{
 		std::shared_ptr<Node<T>> current = Head;
@@ -124,11 +132,13 @@ public:
 		}
 		if (targetNode == Head) 
 		{
-
+			Head = Head->Next;
+			Head->Previous.lock() = nullptr;
 		}
 		else if (targetNode == Tail)
 		{
-
+			Tail = Tail->Previous.lock();
+			Tail->Next = nullptr;
 		}
 		else
 		{
